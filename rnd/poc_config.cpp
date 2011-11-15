@@ -4,6 +4,7 @@
 #include<fstream>
 #include<vector>
 #include<cstdlib>
+#include <sstream>
 
 enum ENUM_FORMAT{
  eINCREMENTAL,
@@ -20,6 +21,7 @@ const int ERR_FORMAT_ERROR = 201001;
 const int ERR_INVALID_FORMAT = 201002;
 const int SUCCESS = 0;
 const int FAILURE = -1;
+const int NO_OF_RECORDS=10;
 
 int parse_line(std::string &_line,struc_tabColumn &_cols)
 {
@@ -73,25 +75,30 @@ void print_col_info(const std::vector<struc_tabColumn>& _vecAllColsInfo)
   }
 }
 
-int getIncrementalValue(const std::string& _inc_val,int& val)
+int getIncrementalValue(const int& _val,std::vector<std::string>& _colData)
 {
-  
+ int count=0;
+ std::string str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZA1B2C3D4R5F7G8H9I10";
+ std::stringstream ss;
+ srand(str.size());
+ for(;count < NO_OF_RECORDS;count++)
+ {
+   int index = rand()%(str.size() - _val);
+   _colData.push_back(str.substr(index,_val));
 
+ }
+
+ return SUCCESS;
+}
+
+int getRandomValue(const int& _start,const int& _end,std::vector<std::string>& _colData)
+{
+ 
 
 
 
  return SUCCESS;
 }
-
-int getRandomValue(const std::string& _inc_val,int& val)
-{
-
-
-
-
- return SUCCESS;
-}
-
 
 int generateColValues(const std::vector<struc_tabColumn>& _vecAllColsInfo, std::map<int,std::vector<std::string> >& mapColValues)
 {
