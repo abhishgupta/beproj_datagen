@@ -75,29 +75,44 @@ void print_col_info(const std::vector<struc_tabColumn>& _vecAllColsInfo)
   }
 }
 
-int getIncrementalValue(const int& _val,std::vector<std::string>& _colData)
+std::vector<std::string> getIncrementalValue(const int& _val=0,const int& _diff=1)
+{
+ int count=0;
+ std::vector<std::string> _colData;
+ std::stringstream ss;
+ int int_val = _val;
+ for(;count < NO_OF_RECORDS;count++)
+ {
+  int_val += _diff; 
+  ss<<int_val;
+  _colData.push_back(ss.str());
+ }
+
+ return _colData;
+}
+
+std::vector<std::string> getRandomValue(const int& _start,const int& _end)
 {
  int count=0;
  std::string str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZA1B2C3D4R5F7G8H9I10";
  std::stringstream ss;
  srand(str.size());
+ std::vector<std::string> _colData;
+
  for(;count < NO_OF_RECORDS;count++)
  {
-   int index = rand()%(str.size() - _val);
-   _colData.push_back(str.substr(index,_val));
+   int len = 0;
+
+   if(_end > _start)
+       len = (rand()%(_end - _start))+_start;
+   else
+       len = _start;
+   int index = rand()%(str.size() - len);
+   _colData.push_back(str.substr(index,len));
 
  }
 
- return SUCCESS;
-}
-
-int getRandomValue(const int& _start,const int& _end,std::vector<std::string>& _colData)
-{
- 
-
-
-
- return SUCCESS;
+ return _colData;
 }
 
 int generateColValues(const std::vector<struc_tabColumn>& _vecAllColsInfo, std::map<int,std::vector<std::string> >& mapColValues)
@@ -105,7 +120,7 @@ int generateColValues(const std::vector<struc_tabColumn>& _vecAllColsInfo, std::
   size_t pos_type = std::string::npos;
   std::vector<struc_tabColumn>::const_iterator itr = _vecAllColsInfo.begin();
 
-  for(;itr != _vecAllColsInfo.end();itr++)
+  for(int col_index=1;itr != _vecAllColsInfo.end();itr++,col_index++)
   {
     struc_tabColumn _cols = (*itr);
     std::cout<<"name="<<_cols.sName<<",type="<<_cols.sType<<",format="<<_cols.sFormat<<std::endl; 
@@ -119,6 +134,7 @@ int generateColValues(const std::vector<struc_tabColumn>& _vecAllColsInfo, std::
       int inc_val = atoi(_cols.sFormat.substr(next_pos_1+1,next_pos_2 - next_pos_1-1).c_str());
 
       std::cout<<"incremental found="<<inc_val<<std::endl;
+      mapColValues.insert(make_pair(col_index,getIncrementalValue(0,inc_val)));
 
     }
     else if(std::string::npos != (pos_type = _cols.sFormat.find(std::string("randomstring"))))
@@ -131,6 +147,7 @@ int generateColValues(const std::vector<struc_tabColumn>& _vecAllColsInfo, std::
       int inc_val2 = atoi(_cols.sFormat.substr(next_pos_2+1,next_pos_1 - next_pos_2-1).c_str());
 
       std::cout<<"randomstring found val1="<<inc_val1<<",val2="<<inc_val2<<std::endl;
+      mapColValues.insert(make_pair(col_index,getRandomValue(inc_val1,inc_val2)));
 
     }
     else
@@ -147,6 +164,30 @@ int generateColValues(const std::vector<struc_tabColumn>& _vecAllColsInfo, std::
  return SUCCESS;
 }
 
+int print_values(std::vector<struc_tabColumn> _vecAllColsInfo,std::map<int,std::vector<std::string> > _mapColValues)
+{
+  size_t pos_type = std::string::npos;
+  std::vector<struc_tabColumn>::iterator itr = _vecAllColsInfo.begin();
+  for(int col_index=1;itr != _vecAllColsInfo.end();itr++,col_index++)
+  {
+    struc_tabColumn _cols = (*itr);
+    std::cout<<"name="<<_cols.sName<<",type="<<_cols.sType<<",format="<<_cols.sFormat<<std::endl; 
+
+    //std::map<int,std::vector<std::string> >::iterator itr;
+    std::vector<std::string>  col_values = _mapColValues[col_index];
+    std::vector<std::string>::iterator itr2 = col_values.begin();
+    for(;itr2 != col_values.end();itr2++)
+    {
+     std::string str = (*itr2); 
+     std::cout<<"value="<<str<<std::endl;
+    }
+
+  }
+
+
+ return SUCCESS;
+}
+
 int main()
 {
  std::ifstream _cfgFile;
@@ -160,15 +201,13 @@ int main()
  {
    while(!_cfgFile.eof()){
        getline(_cfgFile,_line);
-       //std::cout<<"line:"<<_line.c_str()<<std::endl;
        parse_line(_line,_cols);
-
        vecAllColsInfo.push_back(_cols);
-
    }
  }
 
  generateColValues(vecAllColsInfo,mapColValues);
+ print_values(vecAllColsInfo,mapColValues);
 
  return 0;
 }
