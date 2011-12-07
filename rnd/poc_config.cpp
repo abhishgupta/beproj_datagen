@@ -11,6 +11,8 @@ enum ENUM_FORMAT{
  eRANDOMSTRING
 };
 
+// adding to git with a change
+
 struct struc_tabColumn{
  std::string sName;
  std::string sType;
