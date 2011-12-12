@@ -21,37 +21,9 @@ struct column
 
 
 
-string getrandomstring(const int l1, const int l2)
- {
-    string temp;
-	char s[50];
-
-	static const char alphanum[] =
-        //"0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-
-    for (int i = 0; i < l2-l1; ++i) 
-	{
-        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-
-    s[i] = 0;
-	temp=s;
-
-	//cout<<temp;
-
-	return temp;
-}
-
-
-
-
-
-
-int readconfig() // function to parse the the text file onfig.txt
+int readconfig() // function to parse the the text file config.txt
 {
-	int pos=0,len=0,i,j,pos1,pos2,index,arg=1,NoOfRecords=2,count=0;;
+	int pos=0,len=0,i,j,pos1,pos2,index,arg=1,NoOfRecords=10,count=0;;
 	char buf[100],temp[100];
 	string line;
 	
@@ -61,12 +33,6 @@ int readconfig() // function to parse the the text file onfig.txt
 	ofstream ff;
 
 	vector<column> v_col;
-	//std::map<int, vector<string>> m_record;
-	//std::map<int,vector<column>> m_record;
-	//map <string, vector<int> > myMapOfVec;
-	map <int, vector<string> > m_record;
-	map <int, vector<string> >::iterator m_it;
-	//typedef pair <int, vector<string> > m_pair;
 	
 
     fs.open ("f:\\student.cfg", fstream::in | fstream::out | fstream::app);
@@ -136,105 +102,126 @@ int readconfig() // function to parse the the text file onfig.txt
 		
 	}
 
-	//cout<<m_record;
+	
 
 
 	fs.close();
 	fp.close();
 
 
-    int startlimit=15,endlimit=20;
+    int startlimit,endlimit,posi,k,col_index=1,val1,val2;
+	std::map<int,std::vector<std::string> > m_record;
+	std::map<int,std::vector<std::string> > ::iterator itr;
+	//std::vector<std::string> ::iterator it;
+	std::vector<std::string> col1;
+	std::vector<std::string> col2;
+
 	for (index=0; index<v_col.size();index++)
 	{
 
-                if(v_col[index].format.find("incremental"))
-
-                {
-					//find the argument passed to the function, ie value in parenthesis
-					count=0;
-					while(count<NoOfRecords)
-					{
-						itoa(arg,temp,10);//convert integer into string
-
-						line=temp;
-						//m_record[index].insert(line);
-						
-						m_record[index].insert(m_pair (count,temp));
-						//m_record[index].insert(<int,string>(1,'a'));
-
-						cout<<"\nVal of arg :"<<temp;
-
-						arg++;//argument passed in incremental() function			
-						count++;
-					}
-				}
-
-				if(v_col[index].format.find("randomstring"))
-
-                {
-					//find the argument passed to the function, ie value in parenthesis                             
-
-
-					count=0;
-					while(count<NoOfRecords)
-					{
-						line=getrandomstring(startlimit,endlimit);//convert integer into string
-
-
-						cout<<endl;
-
-						cout<<line<<"\n";
-
-				
-
-						m_record[count].push_back(temp);                                           							
-						count++;
-					}
-				}
-	}
-
-
-
-
-count=0;
-string record="";
-ff.open ("f:\\op.txt");
-
-
-
-
-while(count<NoOfRecords)
-{
+		cout<<v_col[index].name;
+		cout<<endl;
+		cout<<v_col[index].type;
+		cout<<endl;
+		cout<<v_col[index].format;
+		cout<<endl;
 	
 		
-	for(m_it=m_record.begin(); m_it!= m_record.end();m_it++)
+		posi=v_col[index].format.find("incremental");
+		
+                if(posi!=-1)
+
+                {
+					startlimit=v_col[index].format.find("(",posi);
+					endlimit=v_col[index].format.find(")",startlimit);
+
+					
+
+					//find the argument passed to the function, ie value in parenthesis
+				
+					count=0;
+					k=0;
+										    
+					int val=atoi(v_col[index].format.substr(startlimit+1,endlimit-startlimit).c_str());//convert integer into string  c_str:converts string into character array
+					                 
+                                while(count<NoOfRecords)
+                                {
+									k=k+val;
+									itoa(k,temp,10);
+									col1.push_back(temp);
+									count++;
+								}
+
+								m_record.insert(make_pair(col_index,col1));
+								cout<<"\nMAP VALUES::";
+
+								
+								 
+								
+						
+				}
+				
+
+			    else 
+					//if(posi=v_col[index].format.find("randomstring"))
+
+                {
+					//find the argument passed to the function, ie value in parenthesis 
+					posi=v_col[index].format.find("randomstring");
+					startlimit=v_col[index].format.find("(",posi);
+					pos1 = v_col[index].format.find(",",startlimit);
+					val1 = atoi(v_col[index].format.substr(startlimit+1,pos1-startlimit).c_str());
+					pos2 = v_col[index].format.find(")",pos1);
+					val2 = atoi(v_col[index].format.substr(pos1+1,pos2).c_str());
+
+
+				
+					string alphanum =
+						"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+					
+					for(count=0;count<NoOfRecords;count++)
+					{
+						int len = 0;
+						if(val2>val1)
+							len = (rand()%(val2-val1))+val1;
+						else
+							len =val1;
+						int index = rand()%(alphanum.size() - len);
+						
+						col2.push_back(alphanum.substr(index,len));
+					}
+
+					
+					col_index=2;
+					m_record.insert(make_pair(col_index,col2));
+
+				}
+
+
+				
+			}
+
+
+
+ff.open ("f:\\op.txt");
+
+for(col_index=1,itr=m_record.begin();itr!=m_record.end();itr++,col_index++)
+{
+	std::vector<std::string> col = m_record[col_index];
+    std::vector<std::string>::iterator it= col.begin();
+	for (it=col.begin();it!=col.end();it++)
 	{
-		//if(record!="")
-
-		record="";
-		
-			//record.append(m_record[m_it].vector<string>);
-
-			//cout<< (*m_it).second<<endl;
-
-			//cout << (*m_it).first << "== " << (*m_it).second << endl;
-
-			//ff<<(*m_it).first<<"== "<<(*m_it).second<<endl;
-
-			record.append((m_it->second)[count]);//get the value from the vector
-			record.append(",");      //column seperator
-			cout<<record;
-			ff<<record;
-
-			
-		
-		count++;
-		
-		
+		std::string str = (*it);
+		std::cout<<"value="<<str<<endl;
+		ff<<str<<endl;
 	}
 }
 
-     ff.close();
+
+
+
+
+ff.close(); 
 
     return true;
 }
