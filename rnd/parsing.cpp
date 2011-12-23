@@ -1,4 +1,5 @@
 #pragma warning (disable : 4786)
+//test
 #pragma warning (disable : 4305)
 #pragma warning (disable : 4309)
 #include<iostream>
