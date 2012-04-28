@@ -11,6 +11,7 @@ enum ENUM_FORMAT{
  eRANDOMSTRING
 };
 
+int j = 7;
 // adding to git with a change
 
 int z = 11;
