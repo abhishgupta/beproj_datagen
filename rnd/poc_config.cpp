@@ -11,6 +11,7 @@ enum ENUM_FORMAT{
  eRANDOMSTRING
 };
 
+int i = 5;
 // adding to git with a change
 
 struct struc_tabColumn{
