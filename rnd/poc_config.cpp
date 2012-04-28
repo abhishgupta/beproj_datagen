@@ -13,6 +13,8 @@ enum ENUM_FORMAT{
 
 // adding to git with a change
 
+int z = 11;
+
 struct struc_tabColumn{
  std::string sName;
  std::string sType;
